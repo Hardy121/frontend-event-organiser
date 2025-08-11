@@ -1,8 +1,35 @@
+import axios from "axios";
 import { GoogleLoginButton } from "./GoogleLoginButton";
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, Shield } from 'lucide-react';
-
+import { useState } from 'react';
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export const SignInForm = ({ formData, handleInputChange, handleNextStep, currentStep, handleBack, otp, setOtp, showPassword, setShowPassword }) => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [resendLoading, setResendLoading] = useState(false);
+    const [resendTimer, setResendTimer] = useState(0);
+    const [jwtToken, setJwtToken] = useState('');
+    const router = useRouter()
+
+
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+    const startResendTimer = () => {
+        setResendTimer(60);
+        const interval = setInterval(() => {
+            setResendTimer((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
     const handleOtpChange = (index, value) => {
         if (value.length <= 1) {
             const newOtp = [...otp];
@@ -21,8 +48,87 @@ export const SignInForm = ({ formData, handleInputChange, handleNextStep, curren
         }
     };
 
-    const handleGoogleSignIn = () => {
-        console.log('Google Sign In');
+
+
+    const handleLogin = async () => {
+        setLoading(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            const response = await axios.post(`${BACKEND_URL}/user/login`, {
+                email: formData.email,
+                password: formData.password,
+            });
+
+            setJwtToken(response?.data?.data?.jwtToken);
+            toast.success(response.data.message || 'Please verify your email.')
+            startResendTimer(); // Start timer when OTP is sent
+            handleNextStep(); // Move to OTP step
+        } catch (error) {
+            console.error('Login error:', error);
+            setError(error?.response?.data?.message || 'Network error. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handle OTP verification (step 2)
+    const handleOtpVerification = async () => {
+        setLoading(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            const otpString = otp.join('');
+            const response = await axios.post(`${BACKEND_URL}/user/verify-otp`, {
+                otp: otpString
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`
+                }
+            });
+
+            toast.success('Login successfully!');
+            // Store the verified token
+            localStorage.setItem('token', response?.data?.data.jwtToken);
+
+            setTimeout(() => {
+                router.push('/')
+            }, 500);
+
+        } catch (error) {
+            toast.error('OTP verification error:', error);
+            setError(error?.response?.data?.message || 'Network error. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handle resend OTP
+    const handleResendOtp = async () => {
+        setResendLoading(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            const response = await axios.post(`${BACKEND_URL}/user/login`, {
+                email: formData.email,
+                password: formData.password,
+            });
+
+            setJwtToken(response?.data?.data?.jwtToken);
+            toast.success(response.data.message || 'Please verify your email.')
+            // toast.success('OTP sent successfully!');
+            setOtp(['', '', '', '', '', '']); // Clear current OTP
+            startResendTimer(); // Start timer again
+
+        } catch (error) {
+            console.error('Resend OTP error:', error);
+            toast.error(error?.response?.data?.message || 'Network error. Please try again.');
+        } finally {
+            setResendLoading(false);
+        }
     };
 
     if (currentStep === 1) {
@@ -33,7 +139,19 @@ export const SignInForm = ({ formData, handleInputChange, handleNextStep, curren
                     <p className="text-gray-600">Sign in to your account</p>
                 </div>
 
-                <div className="space-y-4">
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                        {error}
+                    </div>
+                )}
+
+                {success && (
+                    <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">
+                        {success}
+                    </div>
+                )}
+
+                <div className="space-y-4 text-black">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                         <div className="relative">
@@ -46,6 +164,7 @@ export const SignInForm = ({ formData, handleInputChange, handleNextStep, curren
                                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                 placeholder="Enter your email"
                                 required
+                                disabled={loading}
                             />
                         </div>
                     </div>
@@ -62,11 +181,13 @@ export const SignInForm = ({ formData, handleInputChange, handleNextStep, curren
                                 className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                 placeholder="Enter your password"
                                 required
+                                disabled={loading}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                disabled={loading}
                             >
                                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>
@@ -74,18 +195,25 @@ export const SignInForm = ({ formData, handleInputChange, handleNextStep, curren
                     </div>
                 </div>
 
-                <div className="text-right">
+                {/* <div className="text-right">
                     <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
                         Forgot Password?
                     </button>
-                </div>
+                </div> */}
 
                 <button
-                    onClick={handleNextStep}
-                    disabled={!formData.email || !formData.password}
-                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    onClick={handleLogin}
+                    disabled={!formData.email || !formData.password || loading}
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                 >
-                    Continue
+                    {loading ? (
+                        <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Signing In...
+                        </>
+                    ) : (
+                        'Continue'
+                    )}
                 </button>
 
                 <div className="relative">
@@ -97,7 +225,7 @@ export const SignInForm = ({ formData, handleInputChange, handleNextStep, curren
                     </div>
                 </div>
 
-                <GoogleLoginButton onClick={handleGoogleSignIn} />
+                <GoogleLoginButton />
             </div>
         );
     }
@@ -108,6 +236,7 @@ export const SignInForm = ({ formData, handleInputChange, handleNextStep, curren
                 <button
                     onClick={handleBack}
                     className="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+                    disabled={loading}
                 >
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back
@@ -123,11 +252,23 @@ export const SignInForm = ({ formData, handleInputChange, handleNextStep, curren
                     </p>
                 </div>
 
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                        {error}
+                    </div>
+                )}
+
+                {success && (
+                    <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">
+                        {success}
+                    </div>
+                )}
+
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-4 text-center">
                         Enter Verification Code
                     </label>
-                    <div className="flex justify-center space-x-3">
+                    <div className="flex justify-center space-x-3 text-black">
                         {otp.map((digit, index) => (
                             <input
                                 key={index}
@@ -138,6 +279,7 @@ export const SignInForm = ({ formData, handleInputChange, handleNextStep, curren
                                 onChange={(e) => handleOtpChange(index, e.target.value)}
                                 onKeyDown={(e) => handleOtpKeyDown(index, e)}
                                 className="w-12 h-12 text-center text-lg font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                disabled={loading}
                             />
                         ))}
                     </div>
@@ -145,17 +287,37 @@ export const SignInForm = ({ formData, handleInputChange, handleNextStep, curren
 
                 <div className="text-center">
                     <p className="text-sm text-gray-600 mb-2">Didn't receive the code?</p>
-                    <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                        Resend Code
+                    <button
+                        onClick={handleResendOtp}
+                        disabled={resendTimer > 0 || resendLoading}
+                        className="text-sm text-blue-600 hover:text-blue-800 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
+                    >
+                        {resendLoading ? (
+                            <span className="flex items-center justify-center">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                                Sending...
+                            </span>
+                        ) : resendTimer > 0 ? (
+                            `Resend Code (${resendTimer}s)`
+                        ) : (
+                            'Resend Code'
+                        )}
                     </button>
                 </div>
 
                 <button
-                    onClick={handleNextStep}
-                    disabled={otp.some(digit => !digit)}
-                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    onClick={handleOtpVerification}
+                    disabled={otp.some(digit => !digit) || loading}
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                 >
-                    Sign In
+                    {loading ? (
+                        <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Verifying...
+                        </>
+                    ) : (
+                        'Sign In'
+                    )}
                 </button>
             </div>
         );

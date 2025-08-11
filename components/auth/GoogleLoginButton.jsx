@@ -1,7 +1,40 @@
-export const GoogleLoginButton = ({ onClick }) => {
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+
+export const GoogleLoginButton = () => {
+    const router = useRouter()
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+    const onResponseGoogle = async (authResult) => {
+        // google-login
+        try {
+            if (authResult['code']) {
+                const response = await axios.post(`${BACKEND_URL}/user/google-login`, {
+                    code: authResult?.code
+                });
+                toast.success(response?.data?.message || "Login successfully")
+                router.push('/')
+           }
+
+        } catch (error) {
+            console.log(error);
+            toast.error(error?.response?.data?.message || "error while login")
+        }
+    }
+
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: onResponseGoogle,
+        onError: onResponseGoogle,
+        flow: 'auth-code',
+    });
+
+
     return (
         <button
-            onClick={onClick}
+            onClick={googleLogin}
             className="w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors font-medium text-gray-700"
         >
             <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
@@ -14,3 +47,4 @@ export const GoogleLoginButton = ({ onClick }) => {
         </button>
     );
 };
+

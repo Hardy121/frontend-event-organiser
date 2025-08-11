@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,11 +24,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-        />
-        {children}
+        <GoogleOAuthProvider clientId="704770294821-5qr8htv0ji4t5gfukdl1tq8t2jdhnsn5.apps.googleusercontent.com">
+
+          <Toaster
+            position="top-center"
+            reverseOrder={false}
+          />
+          {children}
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

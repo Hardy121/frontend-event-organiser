@@ -109,9 +109,6 @@ export const SignUpForm = ({ formData, handleInputChange, handleBack, otp, setOt
         }
     };
 
-    const handleGoogleSignUp = () => {
-        console.log('Google Sign Up');
-    };
 
     const handleResendOtp = async () => {
         setLoading(true);
@@ -204,7 +201,7 @@ export const SignUpForm = ({ formData, handleInputChange, handleBack, otp, setOt
                     </div>
                 </div>
 
-                <GoogleLoginButton onClick={handleGoogleSignUp} />
+                <GoogleLoginButton/>
             </div>
         );
     }
