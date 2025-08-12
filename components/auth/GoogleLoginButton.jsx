@@ -16,6 +16,7 @@ export const GoogleLoginButton = () => {
                 });
                 toast.success(response?.data?.message || "Login successfully")
                 router.push('/')
+                localStorage.setItem("token", response?.data?.data?.jwtToken)
            }
 
         } catch (error) {

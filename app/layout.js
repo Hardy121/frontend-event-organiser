@@ -19,12 +19,14 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <GoogleOAuthProvider clientId="704770294821-5qr8htv0ji4t5gfukdl1tq8t2jdhnsn5.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId={clientId }>
 
           <Toaster
             position="top-center"
