@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { Calendar } from 'lucide-react';
-import { SignInForm } from '@/components/auth/SignInForm';
-import { SignUpForm } from '@/components/auth/SignUpForm';
-import { LeftSide } from '@/components/auth/LeftSide';
+import { SignInForm } from '@/components/page/auth/SignInForm';
+import { SignUpForm } from '@/components/page/auth/SignUpForm';
+import { LeftSide } from '@/components/page/auth/LeftSide';
 
 
 // Main Component
