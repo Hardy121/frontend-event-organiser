@@ -1,4 +1,4 @@
-import { Sidebar } from '@/components/page/create-event/event-layout/Sidebar';
+import { Sidebar } from '@/components/layout/Sidebar';
 import React from 'react';
 
 export default function OrganisationPage({children}) {

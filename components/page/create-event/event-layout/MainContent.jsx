@@ -1,144 +1,215 @@
-import { Calendar, MapPin, Plus } from "lucide-react";
-import { MapComponent } from "./Map";
+import { Plus, X } from "lucide-react";
+import { useState } from "react";
+import Faq from "./Faq";
+import axiosInstanceAuthFormData from "@/apiInstance/axiosInstanceAuthFormData";
 
-export const MainContent = () => {
+export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs, eventInputs }) => {
+  const [images, setImages] = useState([]);
+  const [sendImages, setsendImages] = useState([])
+  const [location, setLocation] = useState('');
+
+  const [saveLoading, setSaveLoading] = useState(false)
+
+  const [faqs, setFaqs] = useState([])
+
+
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setsendImages((prev) => {
+      const combinedFiles = [...prev, ...files];
+      return combinedFiles.slice(0, 3);
+    });
+
+    const newImages = files.slice(0, 3).map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+
+    setImages((prev) => [...prev, ...newImages].slice(0, 3));
+  };
+
+
+  async function handleSaveAndContinue() {
+
+
+    try {
+      const formData = new FormData();
+
+      formData.append("title", eventInputs.title || "nusd");
+      formData.append("description", eventInputs.summary);
+      formData.append("date", dateTimeInputs.date);
+      formData.append("startTime", dateTimeInputs.startTime);
+      formData.append("endTime", dateTimeInputs.endTime);
+      formData.append("location", location);
+
+      faqs.forEach((item, index) => {
+        formData.append(`goodToKnow[${index}][question]`, item.question);
+        formData.append(`goodToKnow[${index}][answer]`, item.answer);
+      });
+      sendImages.forEach((file) => {
+        formData.append("images", file); // "images" matches backend field name
+      });
+
+      setSaveLoading(true)
+      const response = await axiosInstanceAuthFormData.post(`/event/create-event`, formData)
+      console.log("response", response)
+      setSaveLoading(false)
+
+    } catch (error) {
+      console.log('error', error)
+      setSaveLoading(false)
+    }
+  }
+
+  const removeImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
-    <div className="flex-1 p-6"> 
-      <div className="relative w-full h-80 bg-gray-100 rounded-lg overflow-hidden mb-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
-              <Plus className="w-6 h-6 text-gray-400" />
-            </div>
-            <div className="text-white text-sm">Upload photos</div>
-            <div className="text-white text-sm">and video</div>
-          </div>
-        </div>
-        
-        {/* Yoga illustration overlay */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative w-full h-full">
-            <div className="absolute left-1/4 top-1/2 transform -translate-y-1/2">
-              <div className="w-16 h-20 bg-gray-700 rounded-t-full relative">
-                <div className="absolute -right-8 top-4 w-8 h-12 bg-gray-700 rounded-full transform rotate-45"></div>
-                <div className="absolute -left-8 top-4 w-8 h-12 bg-gray-700 rounded-full transform -rotate-45"></div>
-                <div className="absolute bottom-0 -left-4 w-8 h-16 bg-gray-700 rounded-full transform rotate-12"></div>
-                <div className="absolute bottom-0 -right-4 w-8 h-16 bg-gray-700 rounded-full transform -rotate-12"></div>
-              </div>
-            </div>
-            
-            <div className="absolute right-1/4 top-1/2 transform -translate-y-1/2">
-              <div className="w-16 h-20 bg-gray-600 rounded-t-full relative">
-                <div className="absolute -right-8 top-4 w-8 h-12 bg-gray-600 rounded-full transform rotate-45"></div>
-                <div className="absolute -left-8 top-4 w-8 h-12 bg-gray-600 rounded-full transform -rotate-45"></div>
-                <div className="absolute bottom-0 -left-4 w-8 h-16 bg-gray-600 rounded-full transform rotate-12"></div>
-                <div className="absolute bottom-0 -right-4 w-8 h-16 bg-gray-600 rounded-full transform -rotate-12"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <button className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50">
-          <Plus className="w-4 h-4 text-gray-600" />
-        </button>
-      </div>
-      
-      {/* Event Details Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold">Event Title</h1>
-          <Plus className="w-6 h-6 text-blue-600 cursor-pointer" />
-        </div>
-        <p className="text-gray-600">A short and sweet sentence about your event.</p>
-      </div>
-      
-      {/* Date and Location Section */}
-      <div className="grid grid-cols-2 gap-8 mb-8">
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Date and time</h3>
-            <Plus className="w-5 h-5 text-blue-600 cursor-pointer" />
-          </div>
-          <div className="flex items-start space-x-3">
-            <Calendar className="w-5 h-5 text-gray-400 mt-1" />
-            <div>
-              <div className="font-medium">Tuesday, September 23 • 10am -</div>
-              <div className="font-medium">12pm GMT+5:30</div>
-            </div>
-          </div>
-        </div>
-        
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Location</h3>
-            <Plus className="w-5 h-5 text-blue-600 cursor-pointer" />
-          </div>
-          <div className="flex items-start space-x-3">
-            <MapPin className="w-5 h-5 text-gray-400 mt-1" />
-            <div>
-              <div className="text-gray-500">Enter a location</div>
-              <button className="text-blue-600 text-sm hover:underline">Hide map</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Map Component */}
-      <MapComponent />
+    <div className="flex-1 p-6 space-y-6 bg-gray-50">
+      {/* Images & Video */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Add images and video</h2>
 
-      <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Overview</h3>
-            <Plus className="w-5 h-5 text-blue-600 cursor-pointer" />
-          </div>
-          <p className="text-gray-600 text-sm">
-            Use this section to provide more details about your event. You can include things to know, venue information, 
-            accessibility options—anything that will help people know what to expect.
-          </p>
-        </div>
-        
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Good to know</h3>
-            <Plus  className="w-5 h-5 text-blue-600 cursor-pointer" />
-          </div>
-          
-          <div className="mb-4">
-            <h4 className="font-medium mb-3">Highlights</h4>
-            <div className="flex flex-wrap gap-2">
-              <button className="px-3 py-1 border border-gray-300 rounded-full text-sm hover:bg-gray-50 flex items-center">
-                <Plus className="w-3 h-3 mr-1" />
-                Add Age Info
-              </button>
-              <button className="px-3 py-1 border border-gray-300 rounded-full text-sm hover:bg-gray-50 flex items-center">
-                <Plus className="w-3 h-3 mr-1" />
-                Add Door Time
-              </button>
-              <button className="px-3 py-1 border border-gray-300 rounded-full text-sm hover:bg-gray-50 flex items-center">
-                <Plus className="w-3 h-3 mr-1" />
-                Add Parking Info
+        {/* Image Preview Section */}
+        <div className="flex gap-4 mb-4">
+          {images.map((img, i) => (
+            <div key={i} className="relative w-40 h-24 border rounded overflow-hidden">
+              <img src={img.preview} alt="preview" className="w-full h-full object-cover" />
+              <button
+                onClick={() => removeImage(i)}
+                className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full p-1"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
+          ))}
+
+          {images.length < 3 && (
+            <label className="w-40 h-24 border-2 border-dashed rounded flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
+              <Plus className="w-6 h-6 text-gray-500" />
+              <span className="text-xs text-gray-500">Add Image</span>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </label>
+          )}
+        </div>
+
+        <p className="text-xs text-gray-500">
+          Recommended: 2160 × 1080px • Max size: 10MB • Formats: JPEG, PNG
+        </p>
+      </div>
+
+      {/* Event Overview */}
+      <div className="bg-white rounded-lg shadow p-6 space-y-4">
+        <h2 className="text-lg font-semibold">Event Overview</h2>
+        <div>
+          <label className="block text-sm font-medium mb-1">Event title *</label>
+          <input
+            type="text"
+            onChange={(e) => setEventInputs({ title: e.target.value })}
+            className="w-full border  rounded px-3 py-2 text-sm"
+            // border-red-500
+            placeholder="Enter event title"
+          />
+          {/* <p className="text-xs text-red-500 mt-1">Event title is required.</p> */}
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Summary *</label>
+          <textarea
+            rows={2}
+            onChange={(e) => setEventInputs({ summary: e.target.value })}
+            className="w-full border rounded px-3 py-2 text-sm"
+            placeholder="Short description of your event"
+          />
+          {/* <p className="text-xs text-red-500 mt-1">Summary is required.</p> */}
+        </div>
+      </div>
+
+      {/* Date & Location */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Date and location</h2>
+        <div className="grid md:grid-cols-4 gap-6">
+          <div className="col-span-2">
+            <label className="block text-sm font-medium mb-1">Date</label>
+            <input
+              type="date"
+              value={dateTimeInputs?.date}
+              onChange={(e) =>
+                setdateTimeInputs(prev => ({
+                  ...prev,
+                  date: e.target.value
+                }))
+              }
+              className="w-full border rounded px-3 py-2 text-sm" />
           </div>
-          
-          <div className="mb-4">
-            <h4 className="font-medium mb-3">Frequently asked questions</h4>
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
-              <div className="flex items-center">
-                <div className="w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center mr-2">
-                  <span className="text-xs text-white font-bold">!</span>
-                </div>
-                <span className="text-sm text-gray-700">Events with FAQs have 8% more organic traffic</span>
-              </div>
-            </div>
-            <button className="text-blue-600 text-sm hover:underline">+ Add question</button>
+          <div className="col-span-1">
+            <label className="block text-sm font-medium mb-1">Start time</label>
+            <input
+              type="time"
+              value={dateTimeInputs?.startTime}
+              onChange={(e) =>
+                setdateTimeInputs(prev => ({
+                  ...prev,
+                  startTime: e.target.value
+                }))
+              }
+              className="w-full border rounded px-3 py-2 text-sm" />
+          </div>
+          <div className="col-span-1">
+            <label className="block text-sm font-medium mb-1">Start time</label>
+            <input
+              type="time"
+              value={dateTimeInputs?.endTime}
+              onChange={(e) =>
+                setdateTimeInputs(prev => ({
+                  ...prev,
+                  endTime: e.target.value
+                }))
+              }
+              className="w-full border rounded px-3 py-2 text-sm" />
           </div>
         </div>
-      
+        <div className="mt-4">
+          <label className="block text-sm font-medium mb-1">Location *</label>
+          <input
+            type="text"
+            onChange={(e) => setLocation(e.target.value)}
+            className="w-full border  rounded px-3 py-2 text-sm"
+            placeholder="Enter a location"
+          />
+          {/* <p className="text-xs text-red-500 mt-1">Location is required.</p> */}
+        </div>
+      </div>
+
+      {/* Overview */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-2">Overview</h2>
+        <div className="text-sm mb-3">Add more details about your event and include what people can expect if they attend.</div>
+        <div className="text-sm mb-3">Use arrow keys to navigate between modules. Use the up and down buttons to reorder modules.</div>
+        <textarea
+          rows={4}
+          className="w-full border rounded px-3 py-2 text-sm"
+          placeholder="Add more details about your event"
+        />
+      </div>
+
+      {/* Good to Know */}
+      <Faq setFaqs={setFaqs} faqs={faqs} />
+
       {/* Save Button */}
       <div className="flex justify-end">
-        <button className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
-          Save and continue
+        <button
+          disabled={saveLoading}
+          onClick={handleSaveAndContinue}
+          className={`px-6 py-2 ${saveLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer"} bg-orange-600 text-white rounded-lg hover:bg-orange-700`}>
+          {saveLoading ? "Saving..." : "Save and continue"}
         </button>
       </div>
     </div>
