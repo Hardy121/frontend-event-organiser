@@ -19,10 +19,14 @@ export default function CreateEventPage({ children }) {
     });
 
     const [dateTimeInputs, setdateTimeInputs] = useState({
-        date: formatDateForInput(days)||'',
+        date: formatDateForInput(days) || '',
         startTime: formatTimeFromMs(startTime) || '',
-        endTime: formatTimeFromMs(endTime) || ''
+        endTime: formatTimeFromMs(endTime) || '',
+        location: '',
+        overView: ''
     })
+
+    // console.log(dateTimeInputs)
 
 
     return (

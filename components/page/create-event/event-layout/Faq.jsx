@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 
 const Faq = ({ faqs, setFaqs }) => {
     const [queAnswerInput, setQueAnswerInput] = useState({
-        id: 1,
         question: '',
         answer: '',
         open: false
@@ -49,14 +48,13 @@ const Faq = ({ faqs, setFaqs }) => {
         setFaqs(prev => [
             ...prev,
             {
-                id: prev.length + 1,
                 question: queAnswerInput?.question,
                 answer: queAnswerInput?.answer,
                 open: queAnswerInput?.open,
             }
         ]
         );
-        setQueAnswerInput({ id: 1, question: '', answer: '', open: false });
+        setQueAnswerInput({ question: '', answer: '', open: false });
         setAddQueAnswer(true);
     }
 
