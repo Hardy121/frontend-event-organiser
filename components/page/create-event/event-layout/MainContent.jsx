@@ -6,12 +6,14 @@ import toast from "react-hot-toast";
 import axiosInstance from "@/apiInstance/axiosInstance";
 import axiosInstanceAuth from "@/apiInstance/axiosInstanceAuth";
 
-export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs, eventInputs }) => {
+export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs, eventInputs, setCurrentView }) => {
   const [images, setImages] = useState([]);
   const [sendImages, setsendImages] = useState([])
   const [saveLoading, setSaveLoading] = useState(false)
   const [faqs, setFaqs] = useState([]);
   const [existingEventData, setExistingEventData] = useState({});
+
+
 
   const [errors, setErrors] = useState({
     title: false,
@@ -63,7 +65,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
       console.log("response", response?.data)
       console.log("id", response?.data?.data?._id)
       localStorage.setItem('eventId', response?.data?.data?._id)
-      toast.success(response?.data?.data?.message || 'Event created!!!')
+      toast.success(response?.data?.message || 'Event created!!!')
       setSaveLoading(false)
     } catch (error) {
       console.log('error', error)
@@ -105,16 +107,44 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
       })));
 
     } catch (error) {
-      console.log()
+      console.log(error)
     }
   }
 
   async function updateEvent() {
-    console.log("updated")
+    const eventId = localStorage.getItem('eventId');
+    if (!eventId) return;
+    try {
+      const formData = new FormData();
+      formData.append("title", eventInputs.title || "nusd");
+      formData.append("description", eventInputs.summary);
+      formData.append("date", dateTimeInputs.date);
+      formData.append("startTime", dateTimeInputs.startTime);
+      formData.append("endTime", dateTimeInputs.endTime);
+      formData.append("location", dateTimeInputs?.location);
+      formData.append("overView", dateTimeInputs?.overView);
+      faqs.forEach((item, index) => {
+        formData.append(`goodToKnow[${index}][question]`, item.question);
+        formData.append(`goodToKnow[${index}][answer]`, item.answer);
+      });
+
+      if (sendImages.length > 0) {
+        sendImages.forEach((file) => {
+          formData.append("images", file);
+        });
+      }
+
+      setSaveLoading(true)
+      const response = await axiosInstanceAuthFormData.put(`/event/updateOrganisersEvents/${eventId}`, formData)
+      toast.success(response?.data?.message || 'Event updated!!!')
+      setSaveLoading(false)
+    } catch (error) {
+      console.log('error', error)
+      setSaveLoading(false)
+    }
   }
 
   function handleCreateEventValidation() {
-
     const newErrors = {
       title: eventInputs?.title?.trim() == '',
       summary: eventInputs?.summary?.trim() == '',
@@ -125,11 +155,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
       overView: dateTimeInputs?.overView?.trim() == ''
     };
     setErrors(newErrors);
-
     return !Object.values(newErrors).includes(true);
-
-
-
   }
 
   async function handleSaveAndContinue() {
@@ -138,6 +164,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
     const isEventExist = localStorage.getItem('eventId');
     if (isEventExist) {
       await updateEvent()
+      setCurrentView('ticket')
     } else {
       await createEvent()
     }
@@ -149,7 +176,6 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
 
   useEffect(() => {
     getEventData();
-    console.log("existingEventData", existingEventData)
   }, [])
 
 

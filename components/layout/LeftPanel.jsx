@@ -5,7 +5,7 @@ export const LeftPanel = ({ setCurrentView, currentView, eventTitle }) => {
 
     const tabs = [
         { key: "build", label: "Build event page", description: "Add all of your event details and let attendees know what to expect" },
-        { key: "tickets", label: "Add Tickets" },
+        { key: "ticket", label: "Add Tickets" },
         { key: "publish", label: "Publish" },
     ];
 
@@ -16,7 +16,7 @@ export const LeftPanel = ({ setCurrentView, currentView, eventTitle }) => {
                     {tabs.map((tab) => (
                         <div
                             key={tab.key}
-                            onClick={() => setCurrentView(tab?.key)}
+                            // onClick={() => setCurrentView(tab?.key)}
                             className={`flex-1 py-3 text-sm font-medium ${currentView == tab.key
                                 ? "border-b-2 border-blue-500 text-blue-600"
                                 : "text-gray-500"
@@ -52,7 +52,7 @@ export const LeftPanel = ({ setCurrentView, currentView, eventTitle }) => {
                     {tabs.map((tab) => (
                         <div
                             key={tab.key}
-                            // onClick={() => setCurrentView(tab?.key)}
+                            onClick={() => setCurrentView(tab?.key)}
                             className="flex items-start space-x-3">
                             <div className={` h-5 border-2 ${currentView == tab?.key ? "border-blue-500 w-7" : "w-5 border-gray-300"}  rounded-full mt-0 flex items-center justify-center`}>
                                 {currentView == tab?.key && <div className="w-3 h-3 bg-blue-500 rounded-full"></div>}
@@ -65,6 +65,22 @@ export const LeftPanel = ({ setCurrentView, currentView, eventTitle }) => {
                         </div>
                     ))}
                 </div>
+
+                <div className="mt-6 p-4 rounded-xl bg-yellow-50 border border-yellow-200 flex items-start space-x-3">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-yellow-600 mt-0.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L4.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p className="text-sm text-yellow-800 font-medium">
+                        Note: You can edit your event before publishing.
+                    </p>
+                </div>
+
             </div>
         </>
     );

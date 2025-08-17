@@ -1,6 +1,8 @@
 "use client"
 import { LeftPanel } from "@/components/layout/LeftPanel";
+import TicketContent from "@/components/page/addTicket/TicketContent";
 import { MainContent } from "@/components/page/create-event/event-layout/MainContent";
+import PublishTicket from "@/components/page/publish/PublishTicket";
 import { formatDateForInput } from "@/utils/formateDate";
 import { formatTimeFromMs } from "@/utils/formateTime";
 import { useState } from "react";
@@ -42,9 +44,14 @@ export default function CreateEventPage({ children }) {
                             setEventInputs={setEventInputs}
                             eventInputs={eventInputs}
                             setdateTimeInputs={setdateTimeInputs}
+                            setCurrentView={setCurrentView}
                             dateTimeInputs={dateTimeInputs} />
-                    </div>
-                    : null}
+                    </div> : currentView == 'ticket' ?
+                        <TicketContent />
+
+                        : currentView == 'publish' ?
+                            <PublishTicket />
+                            : null}
             </div>
         </div>
     )
