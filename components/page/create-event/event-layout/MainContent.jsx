@@ -2,7 +2,7 @@ import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Faq from "./Faq";
 import axiosInstanceAuthFormData from "@/apiInstance/axiosInstanceAuthFormData";
-import toast from "react-hot-toast"; 
+import toast from "react-hot-toast";
 import axiosInstanceAuth from "@/apiInstance/axiosInstanceAuth";
 
 export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs, eventInputs, setCurrentView }) => {
@@ -86,8 +86,12 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
         summary: response?.data?.data.description
       });
 
+      function formatDateForInput(dateString) {
+        if (!dateString) return '';
+        return new Date(dateString).toISOString().split('T')[0];
+      }
       setdateTimeInputs({
-        date: response?.data?.data.date,
+        date: formatDateForInput(response?.data?.data.date),
         startTime: response?.data?.data.startTime || "",
         endTime: response?.data?.data.endTime || "",
         location: response?.data?.data.location || "",
@@ -126,12 +130,16 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
         formData.append(`goodToKnow[${index}][question]`, item.question);
         formData.append(`goodToKnow[${index}][answer]`, item.answer);
       });
+      // Update Event
+      sendImages.forEach((file) => {
+        formData.append("images", file);
+      });
 
-      if (sendImages.length > 0) {
-        sendImages.forEach((file) => {
-          formData.append("images", file);
-        });
-      }
+      existingEventData?.images?.forEach((item, index) => {
+        formData.append(`existingEventData[${index}]`, item);
+      });
+
+
 
       setSaveLoading(true)
       const response = await axiosInstanceAuthFormData.put(`/event/updateOrganisersEvents/${eventId}`, formData)
@@ -170,9 +178,14 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
   }
 
   const removeImage = (index) => {
+    if (images[index]?.preview && !images[index]?.file) {
+      setExistingEventData((prev) => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      }));
+    }
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
-
   useEffect(() => {
     getEventData();
   }, [])

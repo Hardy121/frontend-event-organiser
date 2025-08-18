@@ -182,14 +182,18 @@ const TicketContent = () => {
     try {
       const response = await axiosInstanceAuth.get(`/event/getOrganisersEvents/${eventId}`)
       const eventData = response?.data?.data;
+      function formatDateForInput(dateString) {
+        if (!dateString) return '';
+        return new Date(dateString).toISOString().split('T')[0];
+      }
       if (eventData?.eventTickets && Array.isArray(eventData.eventTickets)) {
         // 🟢 Map backend fields into your frontend state shape
         const mappedTickets = eventData.eventTickets.map(ticket => ({
           type: ticket.type,  // "General", "Reserved", etc.
           quantity: ticket.total ?? 0,
           price: ticket.price ?? 0,
-          salesStarts: ticket.salesStarts || '',
-          salesEnd: ticket.salesEnd || '',
+          salesStarts: formatDateForInput(ticket.salesStarts) || '',
+          salesEnd: formatDateForInput(ticket.salesEnd) || '',
           startTime: ticket.startTime || '',
           endTime: ticket.endTime || '',
           // booked: ticket.booked ?? 0,

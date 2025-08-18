@@ -1,13 +1,25 @@
 "use client"
 import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 import { Calendar, ChevronDown, ChevronLeft } from "lucide-react";
+import { useEffect } from "react";
 
 export const LeftPanel = ({ setCurrentView, currentView, eventTitle, dateTimeInputs }) => {
 
+
+    function getTicket() {
+        const tickets = localStorage.getItem('isTicketEnable');
+        return tickets ? true : false
+    }
+    function getPublish() {
+        const tickets = localStorage.getItem('isPublicEnable');
+        return tickets ? true : false
+    }
+
+
     const tabs = [
-        { key: "build", label: "Build event page", description: "Add all of your event details and let attendees know what to expect" },
-        { key: "ticket", label: "Add Tickets", description: "Add all of your event details and let attendees know what to expect" },
-        { key: "publish", label: "Publish", description: "Add all of your event details and let attendees know what to expect" },
+        { key: "build", isEnable: true, label: "Build event page", description: "Add all of your event details and let attendees know what to expect" },
+        { key: "ticket", isEnable: getTicket(), label: "Add Tickets", description: "Add all of your event details and let attendees know what to expect" },
+        { key: "publish", isEnable: getPublish(), label: "Publish", description: "Add all of your event details and let attendees know what to expect" },
     ];
 
     return (
@@ -39,7 +51,7 @@ export const LeftPanel = ({ setCurrentView, currentView, eventTitle, dateTimeInp
                     <div className="flex items-center text-gray-600 text-sm mb-4">
                         <Calendar className="w-4 h-4 mr-2" />
                         <span>{dateTimeInputs ? `${dateTimeInputs?.date} ${dateTimeInputs?.startTime}` : "2025-08-20 13:45"}</span>
-                    </div> 
+                    </div>
                 </div>
 
                 <div className="space-y-4">
@@ -48,12 +60,12 @@ export const LeftPanel = ({ setCurrentView, currentView, eventTitle, dateTimeInp
                     {tabs.map((tab) => (
                         <div
                             key={tab.key}
-                            onClick={() => setCurrentView(tab?.key)}
-                            className="flex items-start cursor-pointer space-x-3">
+                            onClick={() => tab?.isEnable && setCurrentView(tab?.key)}
+                            className={`flex items-start ${tab?.isEnable ? "cursor-pointer" : "cursor-not-allowed"}  space-x-3`}>
 
                             {currentView == tab?.key ?
                                 <MdRadioButtonChecked size={30} color="#3659E3" /> :
-                                <MdRadioButtonUnchecked size={30} color="#d1d5dc"/>
+                                <MdRadioButtonUnchecked size={30} color="#d1d5dc" />
                             }
 
                             <div>

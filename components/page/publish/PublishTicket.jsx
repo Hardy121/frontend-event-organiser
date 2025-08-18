@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronDown, X, ExternalLink } from 'lucide-react';
+import axiosInstanceAuth from '@/apiInstance/axiosInstanceAuth';
+import Image from 'next/image';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const PublishTicket = () => {
   const [eventType, setEventType] = useState('Other');
-  const [category, setCategory] = useState('Other'); 
+  const [category, setCategory] = useState('Other');
   const [tags, setTags] = useState(['music_festival', 'summer_fun', 'community_event', 'outdoor_concert', 'family_gathering']);
-  const [newTag, setNewTag] = useState(''); 
-  const [isPublic, setIsPublic] = useState(true);
+  const [newTag, setNewTag] = useState('');
   const [allowRefunds, setAllowRefunds] = useState(true);
-  const [refundDays, setRefundDays] = useState('7'); 
+  const [refundDays, setRefundDays] = useState('7');
   const [publishTiming, setPublishTiming] = useState('now');
+
+  const [eventData, setEventData] = useState({});
+  const [publishBtnLoadin, setPublishBtnLoadin] = useState(false);
+
+  const router = useRouter()
 
   const removeTag = (tagToRemove) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
@@ -21,6 +29,51 @@ const PublishTicket = () => {
       setNewTag('');
     }
   };
+
+  async function hanldeOnPublish() {
+    const eventId = localStorage.getItem('eventId');
+    if (!eventId) return;
+    try {
+      setPublishBtnLoadin(true)
+      const response = await axiosInstanceAuth.put(`/event/publicEvent/${eventId}`,
+        {
+          eventType: eventType,
+          category: category,
+          tags: newTag,
+          isRefundPolicy: allowRefunds,
+          refundPolicy: refundDays,
+        }
+      )
+      setPublishBtnLoadin(false);
+      toast.success(response?.data?.message);
+      localStorage.removeItem('eventId');
+      router.push('/')
+
+
+    } catch (error) {
+      console.error("hanldeOnPublish", error)
+      toast.error(error?.response?.data?.message)
+      setPublishBtnLoadin(false)
+
+    }
+  }
+
+  async function getEventData() {
+    const eventId = localStorage.getItem('eventId');
+    if (!eventId) return;
+    try {
+      const response = await axiosInstanceAuth.get(`/event/getOrganisersEvents/${eventId}`)
+      setEventData(response?.data?.data)
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    getEventData()
+  }, [])
+
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -47,18 +100,31 @@ const PublishTicket = () => {
           <div className="bg-white rounded-lg p-6">
             <div className="flex items-start space-x-4">
               <div className="w-52 h-52 bg-gray-100 rounded-lg flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-gray-300 rounded"></div>
+                {eventData.images ?
+                  <Image
+                    src={eventData.images[0]?.url}
+                    alt='image'
+                    width={100}
+                    height={100}
+                    className='w-52 h-52'
+                  /> :
+                  <div className="w-8 h-8 border-2 border-gray-300 rounded"></div>
+                }
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-1">event</h3>
-                <p className="text-sm text-gray-600 mb-2">Friday, October 3 • 10am - 12pm GMT+5:30</p>
-                <p className="text-sm text-gray-500 mb-3">To be announced</p>
+                <h3 className="font-semibold text-gray-900 mb-1">{eventData?.title}</h3>
+                <p className="text-sm text-gray-600 mb-2">{eventData?.date} {eventData?.startTime}</p>
+                {/* <p className="text-sm text-gray-500 mb-3">To be announced</p> */}
                 <div className="flex items-center space-x-4">
-                  <span className="text-lg font-semibold">₹30.00</span>
-                  <span className="text-sm text-gray-500">100</span>
-                  {/* <button className="text-blue-600 hover:text-blue-800 flex items-center text-sm">
-                    Preview <ExternalLink className="w-3 h-3 ml-1" />
-                  </button> */}
+                  {eventData?.eventTickets?.map((item, index) => (
+                    <div className='flex items-center space-x-4' key={index}>
+                      <span className="text-lg font-semibold">{item?.type}</span>
+                      <span className="text-sm text-gray-500">{item?.price}</span>
+                    </div>
+
+                  ))
+
+                  }
                 </div>
               </div>
             </div>
@@ -78,12 +144,11 @@ const PublishTicket = () => {
                   <select
                     value={eventType}
                     onChange={(e) => setEventType(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg appearance-none bg-white"
+                    className="w-full p-3 cursor-pointer border border-gray-300 rounded-lg appearance-none bg-white"
                   >
-                    <option>Other</option>
-                    <option>Conference</option>
-                    <option>Workshop</option>
-                    <option>Concert</option>
+                    {['Other', 'Conference', 'Workshop', 'Concert'].map((item, index) => (
+                      <option className='cursor-pointer mt-1' key={index}>{item}</option>
+                    ))}
                   </select>
                   <ChevronDown className="w-5 h-5 absolute right-3 top-3 text-gray-400 pointer-events-none" />
                 </div>
@@ -95,12 +160,11 @@ const PublishTicket = () => {
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg appearance-none bg-white"
+                    className="w-full  p-3 cursor-pointer border rounded-md border-gray-300 rounded-lg appearance-none bg-white"
                   >
-                    <option>Other</option>
-                    <option>Music</option>
-                    <option>Arts</option>
-                    <option>Business</option>
+                    {['Other', 'Music', 'Arts', 'Business'].map((item, index) => (
+                      <option className='cursor-pointer mt-1' key={index}>{item}</option>
+                    ))}
                   </select>
                   <ChevronDown className="w-5 h-5 absolute right-3 top-3 text-gray-400 pointer-events-none" />
                 </div>
@@ -146,42 +210,11 @@ const PublishTicket = () => {
 
           {/* Publish Settings */}
           <div className="bg-white rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Publish settings</h2>
 
-            {/* Public/Private */}
-            <div className="mb-6">
-              <h3 className="font-medium text-gray-900 mb-3 ">Is your event public or private?</h3>
-              <div className="space-y-2">
-                <label className="flex items-start space-x-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    checked={isPublic}
-                    onChange={() => setIsPublic(true)}
-                    className="mt-1"
-                  />
-                  <div>
-                    <div className="font-medium">Public</div>
-                    <div className="text-sm text-gray-500">Shared on Eventbrite and search engines</div>
-                  </div>
-                </label>
-                <label className="flex items-start space-x-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    checked={!isPublic}
-                    onChange={() => setIsPublic(false)}
-                    className="mt-1"
-                  />
-                  <div>
-                    <div className="font-medium">Private</div>
-                    <div className="text-sm text-gray-500">Shared only with a select audience</div>
-                  </div>
-                </label>
-              </div>
-            </div>
 
             {/* Refund Policy */}
             <div className="mb-6">
-              <h3 className="font-medium text-gray-900 mb-2">Set your refund policy</h3>
+              <h3 className="text-xl text-gray-900 mb-2 font-semibold" >Set your refund policy</h3>
               <p className="text-sm text-gray-600 mb-4">
                 After your event is published, you can only update your policy to make it more flexible for your attendees.
               </p>
@@ -255,13 +288,15 @@ const PublishTicket = () => {
       </div>
       <div className="flex justify-end mt-10">
         <div className='flex items-center gap-3'>
-          <button
+          {/* <button
             className={`px-6 py-2 cursor-pointer bg-orange-600 text-white rounded-lg hover:bg-orange-700`}>
             Edit
-          </button>
+          </button> */}
           <button
-            className={`px-6 py-2 cursor-pointer bg-orange-600 text-white rounded-lg hover:bg-orange-700`}>
-            Publish
+            onClick={hanldeOnPublish}
+            disabled={publishBtnLoadin}
+            className={`px-6 py-2 ${publishBtnLoadin ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:bg-orange-700"}  bg-orange-600 text-white rounded-lg `}>
+            {publishBtnLoadin ? "Publishing..." : "Publish"}
           </button>
         </div>
       </div>

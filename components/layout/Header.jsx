@@ -39,10 +39,6 @@ const Header = () => {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden lg:flex items-center space-x-1">
-                        <Link href="/" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium">
-                            Browse Events
-                        </Link>
-
                         <Link href="/organizations/event/create" className="flex items-center text-white bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm font-medium">
                             <Plus className="h-4 w-4 mr-1" />
                             Create an event
@@ -146,7 +142,6 @@ const Header = () => {
                             className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
                         />
                     </div>
-                    <Link href="/" className="block text-gray-600 hover:text-gray-900">Browse Events</Link>
                     <button className="flex items-center text-white bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm font-medium w-full">
                         <Plus className="h-4 w-4 mr-1" /> Create an event
                     </button>
