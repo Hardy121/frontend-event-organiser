@@ -2,8 +2,7 @@ import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Faq from "./Faq";
 import axiosInstanceAuthFormData from "@/apiInstance/axiosInstanceAuthFormData";
-import toast from "react-hot-toast";
-import axiosInstance from "@/apiInstance/axiosInstance";
+import toast from "react-hot-toast"; 
 import axiosInstanceAuth from "@/apiInstance/axiosInstanceAuth";
 
 export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs, eventInputs, setCurrentView }) => {
@@ -180,7 +179,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
 
 
   return (
-    <div className="flex-1 p-6 space-y-6 bg-gray-50">
+    <div className="flex-1 p-6 space-y-6 bg-gray-50 ">
       {/* Images & Video */}
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-lg font-semibold mb-4">Add images and video</h2>
@@ -200,7 +199,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
           ))}
 
           {images.length < 3 && (
-            <label className="w-40 h-24 border-2 border-dashed rounded flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
+            <label className="w-40 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
               <Plus className="w-6 h-6 text-gray-500" />
               <span className="text-xs text-gray-500">Add Image</span>
               <input
@@ -215,7 +214,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
         </div>
 
         <p className="text-xs text-gray-500">
-          Recommended: 2160 × 1080px • Max size: 10MB • Formats: JPEG, PNG
+          Recommended: 2160 × 1080px • Max size: 5MB • Formats: JPEG, PNG
         </p>
       </div>
 
@@ -228,7 +227,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
             type="text"
             value={eventInputs?.title}
             onChange={(e) => setEventInputs(prev => ({ ...prev, title: e.target.value }))}
-            className={`w-full border rounded ${errors.title ? "border-red-500" : ""} px-3 py-2 text-sm`}
+            className={`w-full border border-gray-300 focus:outline-none  rounded ${errors.title ? "border-red-500" : ""} px-3 py-2 text-sm`}
             placeholder="Enter event title"
           />
           {errors.title && <p className="text-xs text-red-500 mt-1">Event title is required.</p>}
@@ -239,7 +238,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
             rows={2}
             value={eventInputs?.summary}
             onChange={(e) => setEventInputs(prev => ({ ...prev, summary: e.target.value }))}
-            className={`w-full border ${errors.summary ? "border-red-500" : ""} rounded px-3 py-2 text-sm`}
+            className={`w-full border border-gray-300 focus:outline-none ${errors.summary ? "border-red-500" : ""} rounded px-3 py-2 text-sm`}
             placeholder="Short description of your event"
           />
           {errors.summary && <p className="text-xs text-red-500 mt-1">Summary is required.</p>}
@@ -261,7 +260,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
                   date: e.target.value
                 }))
               }
-              className={`w-full ${errors.date ? "border-red-500" : ""} border rounded px-3 py-2 text-sm`} />
+              className={`w-full ${errors.date ? "border-red-500" : ""} border border-gray-300 focus:outline-none rounded px-3 py-2 text-sm`} />
             {errors.date && <p className="text-xs text-red-500 mt-1">Date is required.</p>}
 
           </div>
@@ -276,7 +275,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
                   startTime: e.target.value
                 }))
               }
-              className={`w-full ${errors.startTime ? "border-red-500" : ""} border rounded px-3 py-2 text-sm`} />
+              className={`w-full ${errors.startTime ? "border-red-500" : ""} border border-gray-300 focus:outline-none rounded px-3 py-2 text-sm`} />
             {errors.startTime && <p className="text-xs text-red-500 mt-1">Start time is required.</p>}
           </div>
           <div className="col-span-1">
@@ -290,7 +289,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
                   endTime: e.target.value
                 }))
               }
-              className={`w-full ${errors.endTime ? "border-red-500" : ""} border rounded px-3 py-2 text-sm`} />
+              className={`w-full ${errors.endTime ? "border-red-500" : ""} border border-gray-300 focus:outline-none rounded px-3 py-2 text-sm`} />
             {errors.endTime && <p className="text-xs text-red-500 mt-1">Start time is required.</p>}
 
           </div>
@@ -301,7 +300,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
             type="text"
             value={dateTimeInputs?.location}
             onChange={(e) => setdateTimeInputs(prev => ({ ...prev, location: e.target.value }))}
-            className={`${errors.location ? "border-red-500" : ""} w-full border  rounded px-3 py-2 text-sm`}
+            className={`${errors.location ? "border-red-500" : ""} w-full border  border-gray-300 focus:outline-none rounded px-3 py-2 text-sm`}
             placeholder="Enter a location"
           />
           {errors.location && <p className="text-xs text-red-500 mt-1">Start time is required.</p>}
@@ -322,7 +321,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
               overView: e.target.value
             }))
           }
-          className={`w-full ${errors.overView ? "border-red-500" : ""} border rounded px-3 py-2 text-sm`}
+          className={`w-full ${errors.overView ? "border-red-500" : ""} border border-gray-300 focus:outline-none rounded px-3 py-2 text-sm`}
           placeholder="Add more details about your event"
         />
         {errors.overView && <p className="text-xs text-red-500 mt-1">Overview is required.</p>}
@@ -333,7 +332,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
       <Faq setFaqs={setFaqs} faqs={faqs} />
 
       {/* Save Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end mb-16">
         <button
           disabled={saveLoading}
           onClick={handleSaveAndContinue}

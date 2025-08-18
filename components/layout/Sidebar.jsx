@@ -38,14 +38,14 @@ export const Sidebar = () => {
     return (
         <>
             {/* Desktop Sidebar */}
-            <div className="hidden lg:flex w-16 bg-gray-800 flex-col items-center py-4 space-y-6">
+            <div className="hidden lg:flex w-16  flex-col bg-[#F8F7FA] items-center py-4 space-y-6">
                 <div className="flex flex-col space-y-4">
                     {SidebarData.map((item, index) => (
                         <Link
                             key={index}
                             href={item.link}
-                            className={`p-2 rounded flex items-center justify-center ${
-                                item.link === path ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-700"
+                            className={`p-2 rounded flex items-center text-gray-400 justify-center ${
+                                item.link === path ? "bg-blue-600 text-white" : "hover:text-[#304fc9]"
                             }`}
                         >
                             {item.icon}

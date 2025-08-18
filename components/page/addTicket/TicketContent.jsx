@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Ticket, Zap, Heart, ChevronRight, Calendar } from 'lucide-react';
+import { Ticket, Zap, Heart, ChevronRight, Calendar, Star, Crown } from 'lucide-react';
 import axiosInstanceAuthFormData from '@/apiInstance/axiosInstanceAuthFormData';
 import toast from 'react-hot-toast';
 import axiosInstanceAuth from '@/apiInstance/axiosInstanceAuth';
@@ -25,7 +25,7 @@ const TicketContent = () => {
   const ticketTypes = [
     {
       id: 'General',
-      icon: <Ticket className="w-6 h-6 text-blue-500" />,
+      icon: <Ticket className="w-6 h-6 text-blue-600" />,
       title: 'General',
       description: 'Create a ticket that people have to pay for.',
       bgColor: 'bg-blue-50',
@@ -33,7 +33,7 @@ const TicketContent = () => {
     },
     {
       id: 'Reserved',
-      icon: <Zap className="w-6 h-6 text-purple-500" />,
+      icon: <Zap className="w-6 h-6 text-purple-600" />,
       title: 'Reserved',
       description: 'Create a ticket that no one has to pay for.',
       bgColor: 'bg-purple-50',
@@ -41,21 +41,22 @@ const TicketContent = () => {
     },
     {
       id: 'VIP',
-      icon: <Heart className="w-6 h-6 text-pink-500" />,
+      icon: <Star className="w-6 h-6 text-yellow-600" />,
       title: 'VIP',
-      description: 'Let people pay any amount for their ticket.',
-      bgColor: 'bg-pink-50',
-      iconBg: 'bg-pink-100'
+      description: 'Exclusive premium access with special perks.',
+      bgColor: 'bg-yellow-50',
+      iconBg: 'bg-yellow-100'
     },
     {
       id: 'VVIP',
-      icon: <Heart className="w-6 h-6 text-pink-500" />,
+      icon: <Crown className="w-6 h-6 text-indigo-600" />,
       title: 'VVIP',
-      description: 'Let people pay any amount for their ticket.',
-      bgColor: 'bg-pink-50',
-      iconBg: 'bg-pink-100'
+      description: 'Ultra-exclusive access with luxury benefits.',
+      bgColor: 'bg-indigo-50',
+      iconBg: 'bg-indigo-100'
     }
   ];
+
 
   const handleTicketTypeClick = (ticket) => {
     const existingTicket = eventTickets.find(t => t.type === ticket.id);

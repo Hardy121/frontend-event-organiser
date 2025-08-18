@@ -1,5 +1,7 @@
-import { ArrowDownFromLine, Edit, } from 'lucide-react'
+import { Edit, } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import { FaAngleDown } from "react-icons/fa";
+
 
 const Faq = ({ faqs, setFaqs }) => {
     const [queAnswerInput, setQueAnswerInput] = useState({
@@ -96,7 +98,7 @@ const Faq = ({ faqs, setFaqs }) => {
                                     >
                                         <Edit size={14} />
                                     </button>
-                                    <ArrowDownFromLine />
+                                    <FaAngleDown />
                                 </div>
                             </div>
 
@@ -110,41 +112,33 @@ const Faq = ({ faqs, setFaqs }) => {
                     ))}
                 </div>
                 {addQueAnswer &&
-                    <div className="w-full space-y-6">
+                    <div className="w-full space-y-6 mt-10">
                         {/* Question Field */}
-                        <div className="relative">
+                        <div className="">
                             <input
                                 type="text"
                                 value={queAnswerInput?.question}
                                 onChange={(e) =>
                                     setQueAnswerInput(prev => ({ ...prev, question: e.target.value }))
                                 }
-                                className="peer w-full border border-gray-400 rounded-md px-3 pt-5 pb-2 focus:border-blue-500 focus:outline-none"
-                                placeholder=" "
+                                className="peer w-full border border-gray-400 rounded-md px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                placeholder="Question *"
                             />
-                            <label
-                                className="absolute left-3 top-2.5 text-gray-500 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:top-2.5 peer-focus:text-blue-500 peer-focus:text-sm"
-                            >
-                                Question *
-                            </label>
+                             
                         </div>
 
                         {/* Answer Field */}
-                        <div className="relative">
+                        <div className="">
                             <textarea
                                 value={queAnswerInput?.answer}
                                 onChange={(e) =>
                                     setQueAnswerInput(prev => ({ ...prev, answer: e.target.value }))
                                 }
                                 rows="4"
-                                className="peer w-full border border-gray-400 rounded-md px-3 pt-5 pb-2 focus:border-blue-500 focus:outline-none"
-                                placeholder=" "
+                                className="peer w-full border border-gray-400 rounded-md px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                placeholder="Answer *"
                             />
-                            <label
-                                className="absolute left-3 top-2.5 text-gray-500 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:top-2.5 peer-focus:text-blue-500 peer-focus:text-sm"
-                            >
-                                Answer *
-                            </label>
+                            
                         </div>
                     </div>}
 

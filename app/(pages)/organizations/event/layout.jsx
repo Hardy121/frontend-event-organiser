@@ -33,11 +33,11 @@ export default function CreateEventPage({ children }) {
 
     return (
         <div className="flex">
-            <div className="lg:h-svh lg:sticky fixed lg:left-0 lg:w-auto w-full top-14 z-40 lg:top-0 bg-white ">
-                <LeftPanel eventTitle={eventInputs?.title} setCurrentView={setCurrentView} currentView={currentView} />
+            <div className="lg:h-svh lg:sticky fixed lg:left-0 lg:w-auto w-full top-14 lg:z-40 z-50 lg:top-0 bg-white ">
+                <LeftPanel dateTimeInputs={dateTimeInputs} eventTitle={eventInputs?.title} setCurrentView={setCurrentView} currentView={currentView} />
             </div>
 
-            <div className="lg:h-svh lg:overflow-y-scroll w-full ">
+            <div className="lg:h-svh lg:overflow-y-scroll  w-full lg:max-w-[800px] mx-auto hide-scroll">
                 {currentView == "build" ?
                     <div className="flex  bg-gray-50">
                         <MainContent

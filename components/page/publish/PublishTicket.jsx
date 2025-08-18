@@ -3,15 +3,12 @@ import { ChevronDown, X, ExternalLink } from 'lucide-react';
 
 const PublishTicket = () => {
   const [eventType, setEventType] = useState('Other');
-  const [category, setCategory] = useState('Other');
-  const [subcategory, setSubcategory] = useState('');
+  const [category, setCategory] = useState('Other'); 
   const [tags, setTags] = useState(['music_festival', 'summer_fun', 'community_event', 'outdoor_concert', 'family_gathering']);
-  const [newTag, setNewTag] = useState('');
-  const [organizer, setOrganizer] = useState('');
+  const [newTag, setNewTag] = useState(''); 
   const [isPublic, setIsPublic] = useState(true);
   const [allowRefunds, setAllowRefunds] = useState(true);
-  const [refundDays, setRefundDays] = useState('7');
-  const [autoRefunds, setAutoRefunds] = useState(false);
+  const [refundDays, setRefundDays] = useState('7'); 
   const [publishTiming, setPublishTiming] = useState('now');
 
   const removeTag = (tagToRemove) => {
@@ -49,7 +46,7 @@ const PublishTicket = () => {
           {/* Event Preview Card */}
           <div className="bg-white rounded-lg p-6">
             <div className="flex items-start space-x-4">
-              <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center">
+              <div className="w-52 h-52 bg-gray-100 rounded-lg flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-gray-300 rounded"></div>
               </div>
               <div className="flex-1">
@@ -153,9 +150,9 @@ const PublishTicket = () => {
 
             {/* Public/Private */}
             <div className="mb-6">
-              <h3 className="font-medium text-gray-900 mb-3">Is your event public or private?</h3>
+              <h3 className="font-medium text-gray-900 mb-3 ">Is your event public or private?</h3>
               <div className="space-y-2">
-                <label className="flex items-start space-x-3">
+                <label className="flex items-start space-x-3 cursor-pointer">
                   <input
                     type="radio"
                     checked={isPublic}
@@ -167,7 +164,7 @@ const PublishTicket = () => {
                     <div className="text-sm text-gray-500">Shared on Eventbrite and search engines</div>
                   </div>
                 </label>
-                <label className="flex items-start space-x-3">
+                <label className="flex items-start space-x-3 cursor-pointer">
                   <input
                     type="radio"
                     checked={!isPublic}
@@ -256,7 +253,7 @@ const PublishTicket = () => {
         </div>
 
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-10">
         <div className='flex items-center gap-3'>
           <button
             className={`px-6 py-2 cursor-pointer bg-orange-600 text-white rounded-lg hover:bg-orange-700`}>
