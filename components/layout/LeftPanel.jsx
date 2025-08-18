@@ -1,25 +1,26 @@
 "use client"
 import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 import { Calendar, ChevronDown, ChevronLeft } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const LeftPanel = ({ setCurrentView, currentView, eventTitle, dateTimeInputs }) => {
 
 
-    function getTicket() {
-        const tickets = localStorage.getItem('isTicketEnable');
-        return tickets ? true : false
-    }
-    function getPublish() {
-        const tickets = localStorage.getItem('isPublicEnable');
-        return tickets ? true : false
-    }
+    const [isTicketEnable, setIsTicketEnable] = useState(false);
+    const [isPublicEnable, setIsPublicEnable] = useState(false);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setIsTicketEnable(!!localStorage.getItem("isTicketEnable"));
+            setIsPublicEnable(!!localStorage.getItem("isPublicEnable"));
+        }
+    }, []);
 
 
     const tabs = [
         { key: "build", isEnable: true, label: "Build event page", description: "Add all of your event details and let attendees know what to expect" },
-        { key: "ticket", isEnable: getTicket(), label: "Add Tickets", description: "Add all of your event details and let attendees know what to expect" },
-        { key: "publish", isEnable: getPublish(), label: "Publish", description: "Add all of your event details and let attendees know what to expect" },
+        { key: "ticket", isEnable: isTicketEnable, label: "Add Tickets", description: "Add all of your event details and let attendees know what to expect" },
+        { key: "publish", isEnable: isPublicEnable, label: "Publish", description: "Add all of your event details and let attendees know what to expect" },
     ];
 
     return (
