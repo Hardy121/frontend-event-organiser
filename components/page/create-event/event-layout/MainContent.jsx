@@ -1,9 +1,11 @@
-import { Plus, X } from "lucide-react";
+import { Plus, Sparkles, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Faq from "./Faq";
 import axiosInstanceAuthFormData from "@/apiInstance/axiosInstanceAuthFormData";
 import toast from "react-hot-toast";
 import axiosInstanceAuth from "@/apiInstance/axiosInstanceAuth";
+import axiosInstance from "@/apiInstance/axiosInstance";
+
 
 export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs, eventInputs, setCurrentView }) => {
   const [images, setImages] = useState([]);
@@ -12,6 +14,8 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
   const [faqs, setFaqs] = useState([]);
   const [existingEventData, setExistingEventData] = useState({});
 
+  const [suggestionLoading, setSuggestionLoading] = useState(false)
+  const [suggestionOverviewLoading, setSuggestionOverviewLoading] = useState(false)
 
 
   const [errors, setErrors] = useState({
@@ -135,9 +139,9 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
         formData.append("images", file);
       });
 
-      existingEventData?.images?.forEach((item, index) => {
-        formData.append(`existingEventData[${index}]`, item);
-      });
+      if (existingEventData?.images?.length > 0) {
+        formData.append("existingImages", JSON.stringify(existingEventData.images));
+      }
 
 
 
@@ -186,6 +190,44 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
     }
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
+
+
+  async function handleSuggestSummary() {
+    try {
+      setSuggestionLoading(true)
+      const resoponse = await axiosInstance.post("/event/suggestTitle", {
+        title: eventInputs.title,
+      });
+      setEventInputs(prev => ({ ...prev, summary: resoponse?.data?.data }));
+      toast.success("AI summary suggested!");
+      setSuggestionLoading(false)
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to get AI summary");
+      setSuggestionLoading(false)
+    }
+  }
+
+  async function handleSuggestOverview() {
+    try {
+      setSuggestionOverviewLoading(true)
+      const resoponse = await axiosInstance.post("/event/suggestOverview", {
+        title: eventInputs.title,
+        date: dateTimeInputs.date,
+        time: dateTimeInputs.startTime,
+        location: dateTimeInputs.location,
+      });
+      setSuggestionOverviewLoading(false)
+      setdateTimeInputs(prev => ({ ...prev, overView: resoponse?.data?.data }));
+      toast.success("AI overview suggested!");
+    } catch (error) {
+      console.error(error);
+      setSuggestionOverviewLoading(false)
+      toast.error("Failed to get AI overview");
+    }
+  }
+
+
   useEffect(() => {
     getEventData();
   }, [])
@@ -255,6 +297,15 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
             placeholder="Short description of your event"
           />
           {errors.summary && <p className="text-xs text-red-500 mt-1">Summary is required.</p>}
+          <button
+            onClick={handleSuggestSummary}
+            type="button"
+            disabled={suggestionLoading}
+            className={`mt-2 flex ${!suggestionLoading   ? "cursor-pointer" : "cursor-not-allowed opacity-50"}  items-center text-xs text-blue-600 hover:text-blue-800`}
+          >
+            <Sparkles className="w-4 h-4 mr-1" />
+            {suggestionLoading ? "Suggesting summary..." : "Suggest Summary (AI)"}
+          </button>
         </div>
       </div>
 
@@ -338,7 +389,15 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
           placeholder="Add more details about your event"
         />
         {errors.overView && <p className="text-xs text-red-500 mt-1">Overview is required.</p>}
-
+        <button
+          onClick={handleSuggestOverview}
+          type="button"
+          disabled={suggestionOverviewLoading}
+          className={`mt-2 flex ${!suggestionOverviewLoading ? "cursor-pointer" : "cursor-not-allowed opacity-50"}  items-center text-xs text-blue-600 hover:text-blue-800`}
+        >
+          <Sparkles className="w-4 h-4 mr-1" />
+          {suggestionOverviewLoading ? "Suggesting summary..." : "Suggest Summary (AI)"}
+        </button>
       </div>
 
       {/* Good to Know */}
