@@ -39,7 +39,7 @@ const PublishTicket = () => {
         {
           eventType: eventType,
           category: category,
-          tags: newTag,
+          tags: tags,
           isRefundPolicy: allowRefunds,
           refundPolicy: refundDays,
         }
@@ -106,7 +106,7 @@ const PublishTicket = () => {
                     alt='image'
                     width={100}
                     height={100}
-                    className='w-52 h-52'
+                    className='w-52 h-52 rounded-lg'
                   /> :
                   <div className="w-8 h-8 border-2 border-gray-300 rounded"></div>
                 }
@@ -115,7 +115,7 @@ const PublishTicket = () => {
                 <h3 className="font-semibold text-gray-900 mb-1">{eventData?.title}</h3>
                 <p className="text-sm text-gray-600 mb-2">{eventData?.date} {eventData?.startTime}</p>
                 {/* <p className="text-sm text-gray-500 mb-3">To be announced</p> */}
-                <div className="flex items-center space-x-4">
+                <div className=" space-y-1">
                   {eventData?.eventTickets?.map((item, index) => (
                     <div className='flex items-center space-x-4' key={index}>
                       <span className="text-lg font-semibold">{item?.type}</span>

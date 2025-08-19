@@ -253,10 +253,13 @@ const TicketContent = () => {
           </div>
         </div>
         <div className='flex items-center justify-end'>
+
           <button
             onClick={handleAddTicketsToEvent}
-            className={`px-6 py-2 cursor-pointer bg-orange-600 text-white rounded-lg hover:bg-orange-700`}>
-            Next
+            disabled={saveLoading}
+
+            className={`px-6 py-2  ${saveLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer"} cursor-pointer bg-orange-600 text-white rounded-lg hover:bg-orange-700`}>
+            {saveLoading ? "Saving..." : "Next"}
           </button>
         </div>
       </div>

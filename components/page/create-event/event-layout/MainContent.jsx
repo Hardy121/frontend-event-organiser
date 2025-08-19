@@ -68,10 +68,13 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
       console.log("response", response?.data)
       console.log("id", response?.data?.data?._id)
       localStorage.setItem('eventId', response?.data?.data?._id)
+      localStorage.setItem('isTicketEnable', true)
       toast.success(response?.data?.message || 'Event created!!!')
       setSaveLoading(false)
     } catch (error) {
       console.log('error', error)
+      toast.error(error?.response?.data?.message || 'Event created!!!')
+
       setSaveLoading(false)
     }
   }
@@ -301,7 +304,7 @@ export const MainContent = ({ setEventInputs, dateTimeInputs, setdateTimeInputs,
             onClick={handleSuggestSummary}
             type="button"
             disabled={suggestionLoading}
-            className={`mt-2 flex ${!suggestionLoading   ? "cursor-pointer" : "cursor-not-allowed opacity-50"}  items-center text-xs text-blue-600 hover:text-blue-800`}
+            className={`mt-2 flex ${!suggestionLoading ? "cursor-pointer" : "cursor-not-allowed opacity-50"}  items-center text-xs text-blue-600 hover:text-blue-800`}
           >
             <Sparkles className="w-4 h-4 mr-1" />
             {suggestionLoading ? "Suggesting summary..." : "Suggest Summary (AI)"}
