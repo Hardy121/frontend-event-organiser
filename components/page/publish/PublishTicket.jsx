@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronDown, X, ExternalLink } from 'lucide-react';
+import { ChevronDown, X, ExternalLink, Calendar } from 'lucide-react';
 import axiosInstanceAuth from '@/apiInstance/axiosInstanceAuth';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -13,7 +13,8 @@ const PublishTicket = () => {
   const [allowRefunds, setAllowRefunds] = useState(true);
   const [refundDays, setRefundDays] = useState('7');
   const [publishTiming, setPublishTiming] = useState('now');
-
+  const today = new Date().toISOString().split("T")[0];
+  const [publishDate, setPublishDate] = useState(today)
   const [eventData, setEventData] = useState({});
   const [publishBtnLoadin, setPublishBtnLoadin] = useState(false);
 
@@ -32,7 +33,19 @@ const PublishTicket = () => {
 
   async function hanldeOnPublish() {
     const eventId = localStorage.getItem('eventId');
-    if (!eventId) return;
+    if (!eventId) {
+      toast.error('Create event first')
+      return;
+    }
+    if (publishTiming == "later") {
+      if (!publishDate) {
+        return toast.error('Date is required in Schedule for later')
+      }
+      const now = new Date(publishDate)
+      if (now < new Date()) {
+        return toast.error('Event date should be in future')
+      }
+    }
     try {
       setPublishBtnLoadin(true)
       const response = await axiosInstanceAuth.put(`/event/publicEvent/${eventId}`,
@@ -42,6 +55,8 @@ const PublishTicket = () => {
           tags: tags,
           isRefundPolicy: allowRefunds,
           refundPolicy: refundDays,
+          whenToPublish: publishTiming,
+          publishDate: publishTiming == "now" ? new Date : publishDate
         }
       )
       setPublishBtnLoadin(false);
@@ -281,6 +296,23 @@ const PublishTicket = () => {
                   <span>Schedule for later</span>
                 </label>
               </div>
+
+              {publishTiming == 'later' &&
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Sales start <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative w-56">
+                    <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                    <input
+                      type="date"
+                      value={publishDate}
+                      onChange={(e) => setPublishDate(e.target.value)}
+                      className="w-full pl-9  pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              }
             </div>
           </div>
         </div>

@@ -1,18 +1,130 @@
 "use client";
-import React from "react";
+import { Hero1, Hero2, Hero3 } from "@/app/image";
+import React, { useEffect, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/free-mode";
+import "swiper/css/navigation";
+import "swiper/css/thumbs";
+import { FreeMode, Navigation, Thumbs } from "swiper/modules";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import axiosInstance from "@/apiInstance/axiosInstance";
 
-const EventPage = ({ params }) => {
+
+const EventPage = () => {
+
+    const [thumbsSwiper, setThumbsSwiper] = useState(null);
+    const params = useParams();
+    console.log("first", params)
+    const [ , setEventData] = useState({})
+
+    async function handleEventById() {
+        try {
+            const response = await axiosInstance(`/event/getAllEvent/${params?.slug}`)
+            setEventData(response?.data?.dat)
+        } catch (error) {
+            console.error('handleEventById ~ error', error)
+        }
+    }
+
+    useEffect(() => {
+        handleEventById()
+    }, [])
+
+
     return (
         <div className="px-6 py-10 max-w-7xl mx-auto">
+            <div className="w-full relative">
+                {/* Main Swiper */}
+                <Swiper
+                    style={{
+                        "--swiper-navigation-color": "#fff",
+                        "--swiper-pagination-color": "#fff",
+                    }}
+                    spaceBetween={10}
+                    navigation={true}
+                    thumbs={{ swiper: thumbsSwiper }}
+                    modules={[FreeMode, Navigation, Thumbs]}
+                    className="mySwiper2"
+                >
+                    <SwiperSlide>
+                        <Image
+                            src={Hero1}
+                            alt="banner1"
+                            width={1920}
+                            height={800}
+                            className="w-full h-full object-contain"
+                        />
+                    </SwiperSlide>
+                    <SwiperSlide>
+                        <Image
+                            src={Hero2}
+                            alt="banner2"
+                            width={1920}
+                            height={800}
+                            className="w-full h-fit object-cover"
+                        />
+                    </SwiperSlide>
+                    <SwiperSlide>
+                        <Image
+                            src={Hero3}
+                            alt="banner3"
+                            width={1920}
+                            height={800}
+                            className="w-full h-fit object-cover"
+                        />
+                    </SwiperSlide>
+                </Swiper>
+
+                {/* Thumbnail Swiper */}
+                <Swiper
+                    onSwiper={setThumbsSwiper}
+                    spaceBetween={10}
+                    slidesPerView={4}
+                    freeMode={true}
+                    watchSlidesProgress={true}
+                    modules={[FreeMode, Navigation, Thumbs]}
+                    className="mySwiper mt-4"
+                >
+                    <SwiperSlide>
+                        <Image
+                            src={Hero1}
+                            alt="banner1"
+                            width={400}
+                            height={200}
+                            className="w-full h-fit object-cover"
+                        />
+                    </SwiperSlide>
+                    <SwiperSlide>
+                        <Image
+                            src={Hero2}
+                            alt="banner2"
+                            width={400}
+                            height={200}
+                            className="w-full h-fit object-cover"
+                        />
+                    </SwiperSlide>
+                    <SwiperSlide>
+                        <Image
+                            src={Hero3}
+                            alt="banner3"
+                            width={400}
+                            height={200}
+                            className="w-full h-fit object-cover"
+                        />
+                    </SwiperSlide>
+                </Swiper>
+            </div>
             {/* Grid Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-9">
 
                 {/* Left Content */}
                 <div className="lg:col-span-2 space-y-8">
                     {/* Title Section */}
-                    <div>
-                        <p className="text-gray-500 text-sm">Saturday, 23 August</p>
-                        <h1 className="text-4xl font-bold leading-tight mb-2">
+                    <div className="font-sans-serif">
+                        <p className="text-black font-semibold text-xl">Saturday, 23 August</p>
+                        <h1 className="text-5xl font-bold leading-tight mb-2">
                             Masterclass on achieving financial freedom for working professionals
                         </h1>
                         <p className="text-gray-600">

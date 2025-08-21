@@ -162,7 +162,10 @@ const TicketContent = () => {
 
   async function handleAddTicketsToEvent() {
     const eventId = localStorage.getItem('eventId');
-    if (!eventId) return;
+    if (!eventId) {
+      toast.error('Create event first')
+      return;
+    }
     try {
       setSaveLoading(true)
       const response = await axiosInstanceAuth.put(`/event/addTicketToEvent/${eventId}`, {

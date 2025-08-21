@@ -1,52 +1,27 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Hero1 } from "@/app/image";
-
-const events = [
-    {
-        id: 1,
-        title: "Masterclass on achieving financial freedom for working professionals",
-        date: "Saturday • 2:00 PM",
-        location: "starbucks surat",
-        price: "Free",
-        image: "/events/finance.jpg", 
-    },
-    {
-        id: 2,
-        title: "Upcoming Dubai Real Estate Expo in Surat | Book Free Ticket",
-        date: "Sat, Aug 30 • 10:00 AM",
-        location: "Surat Marriott Hotel",
-        price: "Free",
-        tag: "Just added",
-        image: "/events/dubai-expo.jpg",
-    },
-    {
-        id: 3,
-        title: "Global Talent Acquisition: Hiring Free Developers from DI Solutions WorldYD",
-        date: "Wed, Dec 31 • 10:00 AM",
-        location: "DI Solutions",
-        price: "Free",
-        image: "/events/global-talent.jpg",
-    },
-    {
-        id: 4,
-        title: "5th DAHEJ INDUSTRIAL EXPO 2025",
-        date: "Wed, Nov 12 • 10:00 AM",
-        location: "Bharuch - Dahej Road",
-        price: "Free",
-        image: "/events/dahej-expo.jpg",
-    },
-];
-
-// function to create slug from title
-const slugify = (text) =>
-    text.toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)+/g, "");  
+import axiosInstance from "@/apiInstance/axiosInstance";
 
 const Events = () => {
+
+    const [events, setEvents] = useState([])
+
+    async function handleAllEvents() {
+        try {
+            const response = await axiosInstance.get(`/event/getAllEvents`)
+            setEvents(response?.data?.data)
+        } catch (error) {
+            console.log("handleAllEvents~eror", error)
+        }
+    }
+
+    useEffect(() => {
+        handleAllEvents()
+    }, [])
+
     return (
         <div className="px-6 py-8">
             <h2 className="text-2xl font-bold mb-6">Events in Surat</h2>
@@ -54,7 +29,7 @@ const Events = () => {
                 {events.map((event) => (
                     <Link
                         key={event.id}
-                        href={`/events/${slugify(event.title)}`}
+                        href={`/events/${event._id}`}
                     >
                         <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer">
                             <div className="relative h-40 w-full">
